@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Main {
 
@@ -51,20 +54,58 @@ public class Main {
 		return min;
 	}
 	
-//	public static int DivideAndConquer(int[][] input, int srs, int des) {
-//		int min;
-//		
-//		if (des - srs > 2 ) {
-//			int part1 = DivideAndConquer(input, srs, des/2);
-//			int part2 = DivideAndConquer(input, des/2, des);
-//			
-//			
-//			
-//		} else {
-//			min = input[srs][des - 1];
-//		}
-//		
-//		return min;
-//	}
+	public static BestPath[] DivideAndConquer(int[][] input, int srs, int des) {
+		BestPath[] pathsCost = new BestPath[des - srs];
+		
+		if (des - srs > 1 ) {
+			BestPath[] half1 = DivideAndConquer(input, srs, des/2);
+			BestPath[] half2 = DivideAndConquer(input, des/2, des);
+	
+			for (int i = 0; i < half1.length; i++) {
+				pathsCost[i] = half1[i];
+			}
+			
+			for (int i =  0; i < half2.length; i++) {
+//				BestPath bestOne = new BestPath();
+				pathsCost[des/2 + i] = half2[i];
+				if (pathsCost[des/2 + i].cost == 0) {
+					pathsCost[des/2 + i].cost = (int) Double.POSITIVE_INFINITY;
+				}
+				
+				for (int j = 0; j < half1.length; j++) {
+					BestPath currentPath = pathsCost[des/2 + i];
+					
+					currentPath.paths.addAll(half1[i].paths);
+					
+					int newCost = input[srs + j][des/2 + i];
+					
+					currentPath.cost = newCost + half1[i].cost + half2[j].cost;
+					
+					if (currentPath.cost < bestOne.cost) {
+						bestOne = currentPath;
+					}
+				}
+			}
+			
+			
+		} else {
+			Set<Integer> oneSet = new HashSet<Integer>();
+			oneSet.add(srs);
+			pathsCost[0].paths = oneSet;
+			pathsCost[0].cost = input[srs][des-1];
+		}
+		
+		return pathsCost;
+	}
+	public static class BestPath {
+		Set<Integer> paths;
+		int cost;
+		
+		public BestPath() {
+			paths = new HashSet<Integer>();
+			cost = (int) Double.POSITIVE_INFINITY;
+		}
+	}
+	
 
 }
