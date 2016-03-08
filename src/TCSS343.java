@@ -1,3 +1,7 @@
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
@@ -5,12 +9,13 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.Stack;
 
-public class Canoe {
+public class TCSS343 {
 
 //	static int n;
 //	static int min = 999999999;
 	static int[][] input;
 	static int[] dp;
+	static int[] cheapestSet;
 	
 	public static void main(String[] args) {
     	Scanner sc = new Scanner(System.in);
@@ -48,7 +53,7 @@ public class Canoe {
 //		size = input.length;
 		
     	/* Using input generator */
-		size = 12;
+		size = 20;
 		input = randomTestCase(size);
 		
 //    	/* Print out input table */
@@ -68,15 +73,26 @@ public class Canoe {
 		
     	dp = new int[input[0].length];	// For dynamic program
     	
+    	writeOut();
+//    	
     	BruteForce2();
-		
-       	DivideAndConquer2();
-    	
+//		
+//       	DivideAndConquer2();
+//    	
     	Dynamic2();
-    	
- 
+//    	
+//    	int[] bun = cheapDynamic(input);
+//    	
+//    	for (int i : bun) {
+//    		System.out.print(i + "\t");
+//    	}
+//    	
+//    	System.out.print(cheapestSet[input.length - 1]);
 
+    	DivideAndConquer3();
 	}
+	
+	
 	public static void BruteForce2(){
 		BestPath finalPort = BruteForce2(0);
 		
@@ -139,6 +155,53 @@ public class Canoe {
 		
 	}
 	
+	public static void DivideAndConquer3() {
+    	BestPath a = DivideAndConquer3(0,input.length - 1);
+    	
+    	System.out.println(a.cost);
+    	
+    	System.out.print(1 + " to ");
+    	
+    	while (a.port < input.length - 1) {
+    		System.out.print(a.port + 1 + " to ");
+    		a = a.next;
+    	}
+    	
+    	System.out.println(input.length);
+	}
+	
+	/**
+	 * Calcualte the best cost to go from srs to des
+	 * @param srs
+	 * @param des
+	 * @return the next port object
+	 */
+	public static BestPath DivideAndConquer3(int srs, int des) {
+		int length = des - srs;
+		BestPath goTo = new BestPath();
+		goTo.cost = input[srs][des];
+		goTo.port = des;
+		
+		if (length != 0) {
+			
+
+			for (int i = srs + 1; i < length; i++) {
+				BestPath a = DivideAndConquer3(srs, i);
+
+				BestPath b = DivideAndConquer3(i, des);
+
+				if (a.cost + b.cost < goTo.cost) {
+					goTo.cost = a.cost + b.cost;
+					goTo.port = i;					
+					goTo.next = b;
+				}
+
+			}
+		}
+		
+		return goTo;
+	}
+	
 	public static BestPath[] DivideAndConquer2(int srs, int des) {
 		BestPath[] pathsCost = new BestPath[des - srs];
 		
@@ -184,6 +247,26 @@ public class Canoe {
 		}
 		
 		return pathsCost;
+	}
+	
+
+	
+	public static int[] cheapDynamic(int[][] input) {
+		cheapestSet = new int[input.length]; //cheapest cost at each post
+		int[] postSet = new int[input.length];//post taking for cheapest cost
+		cheapestSet[0] = 0;
+		for (int i = 1; i < input.length; i++) {
+			cheapestSet[i] = Integer.MAX_VALUE;
+			postSet[i] = i - 1;
+			for (int j = i - 1; j >= 0; j--) {
+				if (cheapestSet[j] + input[j][i] < cheapestSet[i]) {
+					postSet[i] = j;
+					cheapestSet[i] = cheapestSet[j] + input[j][i];
+				}
+			}
+		}
+		System.out.println("DYNAMIC PROGRAMMING");
+		return postSet;
 	}
 	
 	
@@ -233,7 +316,6 @@ public class Canoe {
 		int[][] testCase = new int[sizeN][sizeN];
 		Random rd = new Random();
 		for (int i = 0; i < sizeN; i++) {
-			int random = 1;
 			
 			for (int j = 0; j < sizeN; j++) {
 				if (j == i) {
@@ -241,14 +323,36 @@ public class Canoe {
 				} else if (j < i) {
 					testCase[i][j] = (int) Double.POSITIVE_INFINITY;
 				} else {
-					int num = rd.nextInt(1000) + random;
-					random = num;
+					int num = rd.nextInt(sizeN * 100);
 					testCase[i][j] = num;
 				}
 			}
 		}
 		
 		return testCase;
+	}
+	
+	public static void writeOut() {
+		int size = input.length;
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(size + ".txt")));
+			
+			for (int i = 0 ; i < size; i++) {
+				for (int j = 0; j < size ; j++) {
+					if (j == i) bw.write(0);
+					else if (j < i) bw.write("NA");
+					else bw.write(String.valueOf(input[i][j]));
+					if (j < size - 1) bw.write("\t");
+				}
+				bw.write("\r\n");
+			}
+			
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public static class BestPath {
