@@ -53,7 +53,7 @@ public class TCSS343 {
 //		size = input.length;
 		
     	/* Using input generator */
-		size = 20;
+		size = 800;
 		input = randomTestCase(size);
 		
 //    	/* Print out input table */
@@ -75,11 +75,15 @@ public class TCSS343 {
     	
     	writeOut();
 //    	
-    	BruteForce2();
+   
+    	
+ //   	BruteForce2();
 //		
 //       	DivideAndConquer2();
 //    	
     	Dynamic2();
+    	
+ //    	DivideAndConquer3();
 //    	
 //    	int[] bun = cheapDynamic(input);
 //    	
@@ -89,7 +93,7 @@ public class TCSS343 {
 //    	
 //    	System.out.print(cheapestSet[input.length - 1]);
 
-    	DivideAndConquer3();
+    	
 	}
 	
 	
@@ -99,6 +103,9 @@ public class TCSS343 {
 		System.out.println("Using Brute-Force, min cost: \t\t" + finalPort.cost);
 		
 		System.out.print("Path: ");
+		if (finalPort.next != null)
+		first = finalPort.next.port + 1;
+		
 		while (finalPort != null) {						//Reaches last port
 			System.out.print(finalPort.port + 1 + " to ");
 			finalPort = finalPort.next;
@@ -131,6 +138,8 @@ public class TCSS343 {
 		return bestOne;
 	}
 	
+	static int first;
+	
 	public static void DivideAndConquer2() {
 		BestPath[] minPath = DivideAndConquer2(0, input.length);
 		Stack<Integer> stack = new Stack<Integer>();
@@ -147,6 +156,7 @@ public class TCSS343 {
 		}
 		
 		System.out.print("Path: " + 1 + " to ");
+
 		while (!stack.isEmpty()) {
 			System.out.print(stack.pop() + " to ");
 		}
@@ -156,18 +166,25 @@ public class TCSS343 {
 	}
 	
 	public static void DivideAndConquer3() {
-    	BestPath a = DivideAndConquer3(0,input.length - 1);
+    	BestPath a = DivideAndConquer3(0,input.length - 1);		// Get Path of last port
     	
-    	System.out.println(a.cost);
+    	Stack<Integer> stack = new Stack<Integer>();
     	
-    	System.out.print(1 + " to ");
-    	
-    	while (a.port < input.length - 1) {
-    		System.out.print(a.port + 1 + " to ");
-    		a = a.next;
-    	}
-    	
-    	System.out.println(input.length);
+		System.out.println("Using Divide & Conquer, min cost: \t" + a.cost);
+		
+		a = a.previous;				// skip one, because it's the last port
+		
+		while (a != null) {			// Trace back ports until first port
+			stack.push(a.port);		// Push into stack path
+			a = a.previous;
+		}
+
+		System.out.print("Path: " + 1 + " to ");
+		while (!stack.isEmpty()) {
+			System.out.print(stack.pop() + 1 + " to ");
+		}
+		System.out.println(input.length);
+		System.out.println();
 	}
 	
 	/**
@@ -183,17 +200,15 @@ public class TCSS343 {
 		goTo.port = des;
 		
 		if (length != 0) {
-			
-
 			for (int i = srs + 1; i < length; i++) {
 				BestPath a = DivideAndConquer3(srs, i);
 
 				BestPath b = DivideAndConquer3(i, des);
-
-				if (a.cost + b.cost < goTo.cost) {
-					goTo.cost = a.cost + b.cost;
-					goTo.port = i;					
-					goTo.next = b;
+			
+				if (a.cost + b.cost < goTo.cost) {				
+					goTo.cost = a.cost + b.cost;				
+					goTo.previous = a;					
+					goTo.port = b.port;
 				}
 
 			}
@@ -323,7 +338,7 @@ public class TCSS343 {
 				} else if (j < i) {
 					testCase[i][j] = (int) Double.POSITIVE_INFINITY;
 				} else {
-					int num = rd.nextInt(sizeN * 100);
+					int num = rd.nextInt(sizeN * 10);
 					testCase[i][j] = num;
 				}
 			}
@@ -340,7 +355,7 @@ public class TCSS343 {
 			
 			for (int i = 0 ; i < size; i++) {
 				for (int j = 0; j < size ; j++) {
-					if (j == i) bw.write(0);
+					if (j == i) bw.write(String.valueOf("0"));
 					else if (j < i) bw.write("NA");
 					else bw.write(String.valueOf(input[i][j]));
 					if (j < size - 1) bw.write("\t");
