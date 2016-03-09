@@ -9,7 +9,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.Stack;
 
-public class TCSS343 {
+public class tcss343 {
 
 //	static int n;
 //	static int min = 999999999;
@@ -25,7 +25,7 @@ public class TCSS343 {
    
 		
     	
-//    	/* Reading input file passing via command line */
+    	/* Reading input file passing via command line */
 //    	while (sc.hasNext()) {
 //    		inputList.add(sc.nextLine());
 //    	}
@@ -53,7 +53,7 @@ public class TCSS343 {
 //		size = input.length;
 		
     	/* Using input generator */
-		size = 800;
+		size = 34;
 		input = randomTestCase(size);
 		
 //    	/* Print out input table */
@@ -73,17 +73,17 @@ public class TCSS343 {
 		
     	dp = new int[input[0].length];	// For dynamic program
     	
-    	writeOut();
+//    	writeOut();
 //    	
    
     	
- //   	BruteForce2();
+    	BruteForce2();
 //		
-//       	DivideAndConquer2();
+       	DivideAndConquer2();
 //    	
     	Dynamic2();
     	
- //    	DivideAndConquer3();
+//    	DivideAndConquer3();
 //    	
 //    	int[] bun = cheapDynamic(input);
 //    	

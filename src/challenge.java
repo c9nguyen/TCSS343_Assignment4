@@ -1,11 +1,21 @@
-
-public class FieldAndStones {
+/**
+ * A program that takes input of boolean 2D array A[n][n].
+ * such as A[i][j] = true if and only if there is a stone at (i, j)
+ * Program must find the biggest square can be made in the table.
+ * The square should contain no stones.
+ * @author Chinh Nguyen, Vinh Vien, Bun Mam
+ *	
+ */
+public class challenge {
 	static int counter = 0;
-	static boolean[][] input;
+	
+	/* input, the boolean map. input[i][j] = true  
+	 * if and only if there is a stone at location i and j */
+	static boolean[][] input;	
 	
 	public static void main(String[] args) {
-		int n, m;
-		int[] result;
+		int n, m;			
+		int[] result;		// an array of location x, y and size of biggest square
 		int x, y;
 		
 		
@@ -52,13 +62,24 @@ public class FieldAndStones {
 		
 	}
 	
+	/**
+	 * Using brute force to find biggest square
+	 * Iterating through every location and check what is biggest square there
+	 * Using squareHere(i, j, s) method to check if there is square size s
+	 * at location i, j.
+	 * @return array contains location i, j and size of biggest square
+	 */
 	public static int[] BruteForce() {
-		int[] biggest = {-1, -1, 1};
+		int[] biggest = {-1, -1, 1};	// Initialize largest square, size 1.
 		
+		// Iterating through every locations
 		for (int i = 0; i < input.length - biggest[2] ; i++) {
 			for (int j = 0; j < input.length - biggest[2] ; j++) {
-				for (int z = biggest[2] + 1; z < input.length - j; z++) {
-					
+				
+				//Check at location i, j if a square bigger than biggest square
+				// can be at location i, j
+				for (int z = biggest[2] + 1; z <= input.length; z++) {
+					System.out.println(z);
 					if (squareHere(i, j, z)) {
 						biggest[0] = i;
 						biggest[1] = j;
@@ -72,9 +93,19 @@ public class FieldAndStones {
 		return biggest;
 	}
 	
+	/**
+	 * Check if a square size s exists at location x, y
+	 * Iterating through every spots within the location x, y 
+	 * If there is no stone in the range, size s square in x, y is true
+	 * @param x location
+	 * @param y location
+	 * @param s size 
+	 * @return true if square size s exists at x, y
+	 */
 	public static boolean squareHere(int x, int y, int s) {
 		boolean square = true;
 		
+		// Checking for stones
 		for (int i = 0; i < s && square ; i++) {
 			for (int j = 0; j < s && square; j++) {
 				counter++;
@@ -87,16 +118,33 @@ public class FieldAndStones {
 		return square;
 	}
 	
+	/**Using a 2-D to calculate the biggest size of a square
+	 * The array store the size of the square at the location:
+	 * x = i - z, y = j - z
+	 * @return
+	 */
 	public static int[] Dynamic() {
 		int[] biggest = {-1, -1, 1};
 		int[][] dp = new int[input.length][input.length];
 		
+		//Iterating through every locations on the input map
 		for (int i = 0; i < input.length; i++) {
 			for (int j = 0; j < input.length; j++) {
-				if (i == 0 || j == 0) {
-					dp[i][j] = 1;
-				} else if (input[i][j]){
+				
+
+				// If there is a stone, no square
+				if (input[i][j]){
 					dp[i][j] = 0;
+					
+				// If the location is at first row and first column 
+				// Size is can only be 1.
+				} else if (i == 0 || j == 0) {
+						dp[i][j] = 1;
+						
+				// If there is square at locations
+				// (i - 1, j), (i, j - 1), (i - 1, j - 1)
+				// The location (i, j) should be able to make a square size of
+				// the minimum square of one of 3 squares above
 				} else {
 					int top = dp[i - 1][j];
 					int left = dp[i][j - 1];
